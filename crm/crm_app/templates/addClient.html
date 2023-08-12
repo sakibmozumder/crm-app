@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Add New Client{% endblock %}
+{% block content %}
+<div class='container-fluid'>
+    <form method="POST" action="added">
+        {% csrf_token %}
+        <table>
+            <tbody>
+                <tr>
+                    <td>Name:&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td><input type="text" name="Name" placeholder="Client's name"></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>Address:&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td><input type="text" name="Address" placeholder="Client's address"></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>Assigned Personnel:&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>
+                        <select id="person" name="Assigned">
+                            {% for person in personnel %}
+                                <option value={{person.personnelID}}>{{person.firstname}} {{person.lastname}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+        <div><br><br><button class="btn btn-success" type="submit">Create Client</button>
+            <a class="btn btn-warning" href="{% url 'client' %}">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

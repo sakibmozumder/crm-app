@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  {% if clients %}
+  <div class="container-fluid">
+    {% if length %}
+      <a class="btn btn-primary" href="{% url 'add_client' %}">Add New Client</a>
+    {% else %}
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Edit Info</button>
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Delete Client</button>
+      <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Edit Client</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form method="POST" action="edit">
+                {% csrf_token %}                
+                <div class='container-fluid'>
+                  <input type="hidden" id="clientCode" name="clientCode" value="{{clients.0.clientCode}}">
+                  <label class="col-form-label"> Client Name:</label>
+                  <input type="text" name="company" value="{{clients.0.company}}">
+                </div>
+                <div class="form-group">
+                  <label class="col-form-label"> Client Address:</label>
+                  <input type="text" name="address" autocomplete="off" maxlength="100" value="{{clients.0.address}}">
+                </div>
+                <div class="form-group">
+                  <label class="col-form-label"> Assigned Personnel:</label>
+                  <select name="personnelID" >
+                      <option value={{clients.0.personnelID}}>{{clients.0.assigned_personnel}}</option>
+                    {% for person in assigned %}
+                      {% if person.personnelID != clients.0.personnelID %}
+                        <option value={{person.personnelID}}>{{person.firstname}} {{person.lastname}}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>          
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success">Update</button>
+              </form>
+            </div>
+            <div class="modal-footer">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Delete Client</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form method="POST" action="delete">
+                {% csrf_token %}
+                <div class="form-group">
+                  Confirm Deletion of this client
+                </div>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger" name="clientCode" value="{{clients.0.clientCode}}">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+      <select style="float: right; height: 30px;" class="btn btn-success" id="criteria">
+        <option value="1">Search Company Name</option>
+        <option value="0">Search Client Code</option>
+        <option value="2">Search Address</option>
+        <option value="3">Search Assigned Personnel</option>
+        <option value="4">Search Creation Date</option>
+      </select>
+      <input style="float: right; height: 30px; width: 250px;" type="text" id="myInput" onkeyup="tabSearch()" placeholder="Type to search..">
+    <table id = "genericTab" class="table table-hover table-sortable">
+      <thead>
+        <tr>
+          <th scope="col">Client Code</th>
+          <th scope="col">Company</th>
+          <th scope="col">Address</th>
+          <th scope="col">Personnel</th>
+          <th scope="col">Created On</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for client in clients %}
+        <tr>
+          <td style="font-weight:bold" scope="row"><a href="{% url 'get_client' pk=client.clientCode %}">{{client.clientCode}}</a></td>
+          <td>{{client.company}}</td>
+          <td>{{client.address}}</td>
+          <td>{{client.assigned_personnel}}</td>
+          <td>{{client.dateCreated}}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% load static %}
+    <script src="{% static 'tablesort.js' %}"></script>
+    <script src="{% static 'search.js' %}"></script>
+  </div>
+  {% elif personnel %}
+  <div class="container-fluid">    
+    <select style="float: right; height: 30px;" class="btn btn-success" id="criteria">
+      <option value="3">Search Names</option>
+      <option value="0">Search ID</option>
+      <option value="4">Search UserName</option>
+    </select>
+    <input style="float: right; height: 30px; width: 250px;" type="text" id="myInput" onkeyup="tabSearch()" placeholder="Type to search..">
+    <table id = "genericTab" class="table table-hover table-sortable">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Full Name</th>
+          <th scope="col">Username</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for person in personnel %}
+        <tr>
+          <td>{{person.personnelID}}</td>
+          <td>{{person.firstname}}</td>
+          <td>{{person.lastname}}</td>
+          <td>{{person.firstname}} {{person.lastname}}</td>
+          <td>{{person.username}}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+        {% load static %}
+        <script src="{% static 'tablesort.js' %}"></script>
+        <script src="{% static 'search.js' %}"></script>
+  </div>
+  {% else %}
+    <div class ='container-fluid main'>
+      <br>
+      <p style="font-weight:bold; text-align: center;">Hi {{ user.username }}!</p>
+      <br>Few Important tips to navigate around this app:<br><br>
+      <p>&hArr;&nbsp;Use NavBar above to visit different pages.</p>
+      <p>&hArr;&nbsp;Click on Clients to see the clients table. You can Add new client from this page.</p>
+      <p>&hArr;&nbsp;Click on individual client code to go to that particular client's page. You can edit/delete the client from that page.</p>
+      <p>&hArr;&nbsp;Click on Personnel to see the current personnel available to be assigned to clients.</p>
+      <p>&hArr;&nbsp;The Admin link in the NavBar is for admin operations.</p>
+    </div>
+  {% endif %}
+{% else %}
+  <div class ="main">
+      <br><br><br><br><br>
+      <p class="sign" align="center">You are not logged in </p>
+      <input type="button" class="submit" value="Log In" onclick="location.href='/login'">
+  </div>
+{% endif %}
+{% endblock %}

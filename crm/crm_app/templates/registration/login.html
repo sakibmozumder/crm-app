@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+Log in
+{% endblock %}
+{% block navbar %}{% endblock navbar %}
+{% block content %}
+<div class="main">
+    <p class="sign" align="center">Log in</p>
+    <form method="post" class="form1">
+      <div class ="un" align="center">
+        {% csrf_token %}
+        {{ form.as_p }}
+      </div>
+      <button type="submit" class="submit" align="center">Submit</button>
+      <p class="forgot" align="center"><a href="#">Forgot Password?</p>              
+</div>
+{% endblock %}
